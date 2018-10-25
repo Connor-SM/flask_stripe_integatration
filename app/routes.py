@@ -75,7 +75,7 @@ def reset_password(token):
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     # if not correct user, send to homepage
-    user = User.verify_reset_password_token(token):
+    user = User.verify_reset_password_token(token)
     if not user:
         return redirect(url_for('index'))
     form = ResetPasswordForm()
