@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+  <div class="row">
+    <div class="col-md-4 offset-md-4 col-xs-8 offset-xs-2">
+      <h1>Checkout</h1>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-4 offset-md-4 col-xs-8 offset-xs-2">
+      <form action="/charge" method="post">
+        <label for="amount">Amount: </label>
+        <input type="number" name="amount" value="0.00" min=0 step="0.01" id="amount" onChange="updateTotal()" />
+
+        <div id="stripe-script">
+          <script src="https://checkout.stripe.com/checkout.js" class="stripe-button" data-key="{{ key }}" data-description="Flask Stripe Tutorial" data-amount="500" data-locale="auto"></script>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

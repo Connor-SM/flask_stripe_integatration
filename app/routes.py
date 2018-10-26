@@ -1,9 +1,11 @@
 from app import app, db
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, jsonify
 from app.forms import LoginForm, RegistrationForm, CheckPasswordForm, ResetPasswordRequestForm, ResetPasswordForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User
 from app.email import send_password_reset_email
+import stripe
+from app.stripe import Stripe
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -85,3 +87,31 @@ def reset_password(token):
         flash('Your password has been changed!')
         return redirect(url_for('login'))
     return render_template('reset_password.html', form=form)
+
+
+@app.route('/checkout')
+def checkout():
+    return render_template('checkout.html', key=Stripe.stripe_keys['publishable_key'])
+
+
+@app.route('/charge', methods=['GET', 'POST'])
+def charge():
+    amount = float(request.form['amount'])
+    amount = int(amount * 100)
+
+    customer = stripe.Customer.create(email='example@gmail.com',
+        source=request.form['stripeToken'])
+
+    charge = stripe.Charge.create(
+        customer=customer.id,
+        amount=amount,
+        currency="usd",
+        description="Flask Tutorial Stripe Charge"
+    )
+
+    return render_template('charge.html', amount=(amount/100))
+
+
+@app.route('/getKey', methods=['GET', 'POST'])
+def getKey():
+    return jsonify(key=Stripe.stripe_keys['publishable_key'])
